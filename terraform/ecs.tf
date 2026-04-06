@@ -51,35 +51,42 @@ resource "aws_ecs_task_definition" "app" {
 }
 
 resource "aws_security_group" "ecs_tasks" {
-  name = "products-api-sg-task"
+  name        = "products-api-sg-task"
   description = "Allow inbound access from ALB only"
-  vpc_id = module.vpc.vpc_id
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
-    protocol = "tcp"
-    from_port = 8000
-    to_port = 8000
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol        = "tcp"
+    from_port       = 8000
+    to_port         = 8000
+    security_groups = [aws_security_group.alb_sg.id]
   }
 
   egress {
-    protocol = "-1"
-    from_port = 0
-    to_port = 0
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 resource "aws_ecs_service" "main" {
-  name = "products-api-service"
-  cluster = aws_ecs_cluster.main.id
+  name            = "products-api-service"
+  cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.app.arn
-  desired_count = 1
-  launch_type = "FARGATE"
+  desired_count   = 1
+  launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups = [aws_security_group.ecs_tasks.id]
-    subnets = module.vpc.private_subnets
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    subnets          = module.vpc.private_subnets
     assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.alb_tg.arn
+    # below has to be identical as the ones described in resource "aws_ecs_task_definition" "app"
+    container_name = "products-api"
+    container_port = 8000
   }
 }
