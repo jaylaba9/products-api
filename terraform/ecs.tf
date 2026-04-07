@@ -46,6 +46,14 @@ resource "aws_ecs_task_definition" "app" {
           hostPort      = 8000
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group" = aws_cloudwatch_log_group.main_logs.name
+          "awslogs-region" = "eu-central-1"
+          "awslogs-stream-prefix" = "products-api"
+        }
+      }
     }
   ])
 }
@@ -89,4 +97,9 @@ resource "aws_ecs_service" "main" {
     container_name = "products-api"
     container_port = 8000
   }
+}
+
+resource "aws_cloudwatch_log_group" "main_logs" {
+  name = "/ecs/products-api"
+  retention_in_days = 3
 }

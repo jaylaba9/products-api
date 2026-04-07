@@ -33,7 +33,7 @@ resource "aws_lb_target_group" "alb_tg" {
   vpc_id      = module.vpc.vpc_id
 
   health_check {
-    path = "/"
+    path = "/health"
   }
 }
 
