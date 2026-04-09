@@ -27,6 +27,25 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# inline policy for retrieving password to database from secrets manager
+resource "aws_iam_role_policy" "ecs_task_get_secret" {
+  name = "products-api-get-db-secret"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+   policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "secretsmanager:GetSecretValue",
+        ]
+        Effect   = "Allow"
+        Resource = aws_secretsmanager_secret.db_secret.arn
+      },
+    ]
+  })
+}
+
 resource "aws_ecs_task_definition" "app" {
   family                   = "products-api-task"
   network_mode             = "awsvpc"
@@ -54,6 +73,26 @@ resource "aws_ecs_task_definition" "app" {
           "awslogs-stream-prefix" = "products-api"
         }
       }
+      environment = [
+        {
+          name  = "DB_HOST"
+          value = aws_db_instance.rds_db.address
+        },
+        {
+          name  = "DB_NAME"
+          value = aws_db_instance.rds_db.db_name
+        },
+        {
+          name  = "DB_USER"
+          value = aws_db_instance.rds_db.username
+        }
+      ]
+      secrets = [
+        {
+          name = "DB_PASSWORD"
+          valueFrom = aws_secretsmanager_secret.db_secret.arn
+        }
+      ]
     }
   ])
 }
