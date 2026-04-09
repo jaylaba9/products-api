@@ -38,3 +38,26 @@ Container Orchestration (ECS):
 
 - Deployed an ECS Service managing the container lifecycle in private subnets.
 
+Load Balancing:
+
+- Application Load Balancer (ALB): Deployed a public-facing ALB to distribute traffic across ECS tasks in private subnets.
+
+- Target Groups & Health Checks: Configured HTTP health checks on /health to ensure traffic is only routed to healthy containers.
+
+- Security Layering: Implemented a dual-layer SG architecture: ALB accepts public traffic on port 80 and forwards it to ECS tasks on port 8000 via a private internal "relay".
+
+Monitoring & Observability:
+
+- CloudWatch Logs: Configured centralized logging using awslogs driver.
+
+- Log Groups: Created dedicated CloudWatch Log Groups with defined retention policies for real-time application monitoring and debugging.
+
+Database & Secrets Management:
+
+- AWS RDS (PostgreSQL): Deployed a managed PostgreSQL 15 instance within private subnets to ensure data isolation.
+
+- DB Subnet Groups: Isolated database traffic within a dedicated subnet group across multiple Availability Zones.
+
+- AWS Secrets Manager: Implemented secure credential management. Database passwords are automatically generated via random_password and injected into ECS tasks at runtime.
+
+- IAM Access: Configured ECS Task Execution Role with specific GetSecretValue permissions to retrieve credentials without hardcoding them in the environment.
