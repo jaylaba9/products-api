@@ -16,11 +16,11 @@ The infrastructure is designed with a "Security First" approach, ensuring that s
 
 ## Tech Stack
 
- * **Backend**  Python 3.13, FastAPI 
- * **ORM**  SQLAlchemy
- * **Containerization** Docker (optimized `python:3.13-slim` image + layer caching) 
- * **Infrastructure**  Terraform 
- * **Cloud Provider**  AWS (ECR, ECS, RDS, Secrets Manager, CloudWatch) 
+ * **Backend**: Python 3.13, FastAPI 
+ * **ORM**: SQLAlchemy
+ * **Containerization**: Docker (optimized `python:3.13-slim` image + layer caching) 
+ * **Infrastructure**:  Terraform 
+ * **Cloud Provider**:  AWS (ECR, ECS, RDS, Secrets Manager, CloudWatch) 
 
 ---
 
